@@ -1,0 +1,77 @@
+import { useState } from "react";
+import api from "../services/api";
+import { useNavigate } from "react-router-dom";
+
+export default function Login() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
+    setMessage("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+    try {
+      const res = await api.post("/auth/login", formData);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userName", res.data.user.name);
+      setMessage("✅ Logged in successfully! Redirecting...");
+      setTimeout(() => {
+        setMessage("");
+        navigate("/dashboard");
+      }, 1000);
+      // navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "❌ Login failed.");
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#A5D8FF] to-[#D8B4FE]">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-xl shadow-lg w-80 space-y-4"
+      >
+        <h2 className="text-2xl font-bold text-center text-blue-600">Login</h2>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
+        />
+        <button
+          type="submit"
+          className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-500 transition"
+        >
+          Login
+        </button>
+
+        {message && (
+          <div className="text-center text-sm bg-green-100 text-green-700 p-2 rounded">
+            {message}
+          </div>
+        )}
+        {error && (
+          <div className="text-center text-sm bg-red-100 text-red-700 p-2 rounded">
+            {error}
+          </div>
+        )}
+      </form>
+    </div>
+  );
+}
