@@ -34,6 +34,7 @@ export default function Register() {
 
       // 3. Store token
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userName", res.data.user.name);
 
       // 4. Redirect
       setMessage("✅ Registered and logged in!");
