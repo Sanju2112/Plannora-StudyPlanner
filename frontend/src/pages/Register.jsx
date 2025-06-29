@@ -40,7 +40,12 @@ export default function Register() {
       setMessage("✅ Registered and logged in!");
       setTimeout(() => navigate("/dashboard"), 1000);
     } catch (err) {
-      setError(err.response?.data?.message || "❌ Registration failed.");
+      const errorMessage = err.response?.data?.message;
+      if (errorMessage === "User already exists") {
+        setError("You already have an account. Please log in.");
+      } else {
+        setError(errorMessage || "❌ Registration failed.");
+      }
     }
   };
 
